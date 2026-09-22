@@ -595,13 +595,16 @@ jobs:
         run: |
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
           import sys
+          from contextlib import redirect_stdout
+
           sys.path.insert(0, "build_tools/github_actions")
-          from amdgpu_family_matrix import (
-              amdgpu_family_info_matrix_presubmit as M,
-              select_weighted_label,
-          )
-          info = M["gfx94x"]["linux"]
-          label = select_weighted_label(info["test-runs-on-labels"], "gfx94X-dcgpu")
+          with redirect_stdout(sys.stderr):
+              from amdgpu_family_matrix import (
+                  amdgpu_family_info_matrix_presubmit as M,
+                  select_weighted_label,
+              )
+              info = M["gfx94x"]["linux"]
+              label = select_weighted_label(info["test-runs-on-labels"], "gfx94X-dcgpu")
           print(f"label={label}")
           PY
 
