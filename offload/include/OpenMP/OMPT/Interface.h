@@ -28,15 +28,9 @@
 #include <functional>
 #include <tuple>
 
-<<<<<<< HEAD
 #pragma push_macro("DEBUG_PREFIX")
 #undef DEBUG_PREFIX
 #define DEBUG_PREFIX "OMPT"
-=======
-#define OMPT_IF_BUILT(stmt) stmt
-#define OMPT_IF_BUILT_AND_INITIALIZED(stmt)                                    \
-  OMPT_IF_BUILT(performIfOmptInitialized(stmt))
->>>>>>> 3a4d4104528d
 
 /// Callbacks for target regions require task_data representing the
 /// encountering task.
@@ -585,15 +579,8 @@ private:
 // The getter returns the address stored in the thread local variable.
 #define OMPT_GET_RETURN_ADDRESS llvm::omp::target::ompt::ReturnAddress
 
-<<<<<<< HEAD
 #pragma pop_macro("DEBUG_PREFIX")
 
 #endif // OMPT_SUPPORT
-=======
-#else
-#define OMPT_IF_BUILT(stmt)
-#define OMPT_IF_BUILT_AND_INITIALIZED(stmt)
-#endif
->>>>>>> 3a4d4104528d
 
 #endif // OFFLOAD_INCLUDE_OPENMP_OMPT_INTERFACE_H
