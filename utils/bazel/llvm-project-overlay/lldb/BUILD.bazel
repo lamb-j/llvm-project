@@ -1283,6 +1283,7 @@ cc_binary(
         "//lldb:liblldb.wrapper",
         "//llvm:Option",
         "//llvm:Support",
+        "//llvm:Telemetry",
         "//llvm:config",
     ],
 )
