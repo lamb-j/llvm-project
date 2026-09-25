@@ -20,8 +20,11 @@
 #include "Shared/Utils.h"
 #include "Utils/ELF.h"
 #include "omptarget.h"
+<<<<<<< HEAD
 #include "print_tracing.h"
 #include "trace.h"
+=======
+>>>>>>> 3a4d4104528d
 
 #include "llvm/Bitcode/BitcodeReader.h"
 #include "llvm/Frontend/OpenMP/OMPConstants.h"
@@ -618,11 +621,14 @@ Error GenericDeviceTy::init(GenericPluginTy &Plugin) {
   if (auto Err = initImpl(Plugin))
     return Err;
 
+<<<<<<< HEAD
   if (Profiler)
     // Invokes profiler backend to dispatch event. Required here to enable
     // capture hardware-time slope data
     Profiler->handleInit(this, &Plugin);
 
+=======
+>>>>>>> 3a4d4104528d
   // Read and reinitialize the envars that depend on the device initialization.
   // Notice these two envars may change the stack size and heap size of the
   // device, so they need the device properly initialized.
@@ -702,9 +708,12 @@ Error GenericDeviceTy::deinit(GenericPluginTy &Plugin) {
     RecordReplay = nullptr;
   }
 
+<<<<<<< HEAD
   if (auto Profiler = Plugin.getProfiler(); Profiler)
     Profiler->handleDeinit(this, &Plugin);
 
+=======
+>>>>>>> 3a4d4104528d
   return deinitImpl();
 }
 Expected<DeviceImageTy *>
@@ -752,9 +761,12 @@ GenericDeviceTy::loadBinary(GenericPluginTy &Plugin, StringRef InputTgtImage,
   if (auto Err = setupRPCServer(Plugin, *Image))
     return std::move(Err);
 
+<<<<<<< HEAD
   if (auto Profiler = Plugin.getProfiler(); Profiler)
     Profiler->handleLoadBinary(this, &Plugin, InputTgtImage);
 
+=======
+>>>>>>> 3a4d4104528d
   // Call any global constructors present on the device.
   if (auto Err = callGlobalConstructors(Plugin, *Image))
     return std::move(Err);
@@ -2303,6 +2315,7 @@ int GenericPluginTy::prepopulate_page_table(int32_t DeviceId, void *ptr,
   return R;
 }
 
+<<<<<<< HEAD
 int32_t GenericPluginTy::set_device_identifier(int32_t UserId,
                                                int32_t DeviceId) {
   UserDeviceIds[DeviceId] = UserId;
@@ -2335,6 +2348,10 @@ void GenericPluginTy::set_coarse_grain_mem(int32_t DeviceId, const void *ptr,
              << toString(std::move(Err)).data();
   T.res(0);
   return;
+=======
+int32_t GenericPluginTy::use_auto_zero_copy(int32_t DeviceId) {
+  return getDevice(DeviceId).useAutoZeroCopy();
+>>>>>>> 3a4d4104528d
 }
 
 int32_t GenericPluginTy::is_accessible_ptr(int32_t DeviceId, const void *Ptr,

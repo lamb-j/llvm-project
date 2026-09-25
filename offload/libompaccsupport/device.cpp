@@ -97,6 +97,14 @@ llvm::Error DeviceTy::init() {
                                      DeviceID);
   setTeamProcs(RTL->number_of_team_procs(RTLDeviceID));
 
+  OMPT_IF_BUILT_AND_INITIALIZED({
+    GenericDeviceTy &GenericDevice = RTL->getDevice(RTLDeviceID);
+    std::string ComputeUnitKind = GenericDevice.getComputeUnitKind();
+    performOmptCallback(device_initialize, DeviceID, ComputeUnitKind.c_str(),
+                        reinterpret_cast<ompt_device_t *>(&GenericDevice),
+                        lookupCallbackByName, /*documentation=*/nullptr);
+  });
+
   // Enables recording kernels if set.
   BoolEnvar OMPX_RecordKernel("LIBOMPTARGET_RECORD", false);
   if (OMPX_RecordKernel) {
@@ -230,6 +238,7 @@ DeviceTy::loadBinary(__tgt_device_image *Img) {
     return error::createOffloadError(error::ErrorCode::INVALID_BINARY,
                                      "failed to load binary %p", Img);
 
+<<<<<<< HEAD
   AsyncInfoTy AsyncInfo(*this);
   // From the image, read whether fast reduction is enabled (optional symbol).
   void *IsFastReductionEnabledPtr;
@@ -243,6 +252,15 @@ DeviceTy::loadBinary(__tgt_device_image *Img) {
       RTL->getDevice(RTLDeviceID)
           .setIsFastReductionEnabled(IsFastReductionEnabled);
   }
+=======
+  OMPT_IF_BUILT_AND_INITIALIZED(performOmptCallback(
+      device_load, DeviceID, /*FileName=*/nullptr, /*FileOffset=*/0,
+      /*VmaInFile=*/nullptr,
+      reinterpret_cast<uintptr_t>(Img->ImageEnd) -
+          reinterpret_cast<uintptr_t>(Img->ImageStart),
+      const_cast<void *>(Img->ImageStart),
+      /*DeviceAddr=*/nullptr, /*ModuleId=*/0));
+>>>>>>> 3a4d4104528d
 
   // This symbol is optional.
   void *DeviceEnvironmentPtr;

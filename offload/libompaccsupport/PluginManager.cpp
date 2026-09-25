@@ -15,6 +15,7 @@
 #include "OpenMP/OMPT/OmptCommonDefs.h"
 #include "OpenMP/OMPT/OmptTracing.h"
 #include "OffloadPolicy.h"
+#include "OpenMP/OMPT/Interface.h"
 #include "Shared/Debug.h"
 #include "Shared/Profile.h"
 #include "device.h"
@@ -22,6 +23,10 @@
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
 #include <memory>
+
+#ifdef OMPT_SUPPORT
+using namespace llvm::omp::target::ompt;
+#endif
 
 using namespace llvm;
 using namespace llvm::sys;
@@ -70,12 +75,20 @@ void PluginManager::deinit() {
   }
   ODBG(ODT_Deinit) << "Unloading RTLs...";
 
+<<<<<<< HEAD
 #ifdef OMPT_SUPPORT
   assert(TraceRecordManager != nullptr &&
          "Trace record manager should have been non-null");
   delete TraceRecordManager;
   TraceRecordManager = nullptr;
 #endif
+=======
+  OMPT_IF_BUILT_AND_INITIALIZED({
+    auto ExclusiveDevicesAccessor = getExclusiveDevicesAccessor();
+    for (DeviceTy &Device : devices(ExclusiveDevicesAccessor))
+      performOmptCallback(device_finalize, Device.DeviceID);
+  });
+>>>>>>> 3a4d4104528d
 
   for (auto &Plugin : Plugins) {
     if (!Plugin->is_initialized())
@@ -121,11 +134,6 @@ bool PluginManager::initializeDevice(GenericPluginTy &Plugin,
   auto ExclusiveDevicesAccessor = getExclusiveDevicesAccessor();
 
   int32_t UserId = ExclusiveDevicesAccessor->size();
-
-  // Set the device identifier offset in the plugin.
-#ifdef OMPT_SUPPORT
-  Plugin.set_device_identifier(UserId, DeviceId);
-#endif
 
   auto Device = std::make_unique<DeviceTy>(&Plugin, UserId, DeviceId);
   if (auto Err = Device->init()) {
