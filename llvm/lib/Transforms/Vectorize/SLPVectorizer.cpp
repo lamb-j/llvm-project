@@ -3026,16 +3026,6 @@ private:
       return S.getMatchingMainOpOrAltOp(I);
     }
 
-    /// Chooses the correct key for scheduling data. If \p Op has the same (or
-    /// alternate) opcode as \p OpValue, the key is \p Op. Otherwise the key is
-    /// \p OpValue.
-    Value *isOneOf(Value *Op) const {
-      auto *I = dyn_cast<Instruction>(Op);
-      if (I && getMatchingMainOpOrAltOp(I))
-        return Op;
-      return S.getMainOp();
-    }
-
     void setOperations(const InstructionsState &S) {
       assert(S && "InstructionsState is invalid.");
       this->S = S;
@@ -4219,20 +4209,6 @@ private:
           SchedulingRegionID(BlockSchedulingRegionID), Bundle(Bundle) {}
     static bool classof(const ScheduleEntity *Entity) {
       return Entity->getKind() == Kind::ScheduleCopyableData;
-    }
-
-    /// Verify basic self consistency properties
-    void verify() {
-      if (hasValidDependencies()) {
-        assert(UnscheduledDeps <= Dependencies && "invariant");
-      } else {
-        assert(UnscheduledDeps == Dependencies && "invariant");
-      }
-
-      if (IsScheduled) {
-        assert(hasValidDependencies() && UnscheduledDeps == 0 &&
-               "unexpected scheduled state");
-      }
     }
 
     /// Returns true if the dependency information has been calculated.
@@ -30728,17 +30704,6 @@ private:
   /// Total number of operands in the reduction operation.
   static unsigned getNumberOfOperands(Instruction *I) {
     return isCmpSelMinMax(I) ? 3 : (I->isUnaryOp() ? 1 : 2);
-  }
-
-  /// Checks if the instruction is in basic block \p BB.
-  /// For a cmp+sel min/max reduction check that both ops are in \p BB.
-  static bool hasSameParent(Instruction *I, BasicBlock *BB) {
-    if (isCmpSelMinMax(I) || isBoolLogicOp(I)) {
-      auto *Sel = cast<SelectInst>(I);
-      auto *Cmp = dyn_cast<Instruction>(Sel->getCondition());
-      return Sel->getParent() == BB && Cmp && Cmp->getParent() == BB;
-    }
-    return I->getParent() == BB;
   }
 
   /// Expected number of uses for reduction operations/reduced values.
